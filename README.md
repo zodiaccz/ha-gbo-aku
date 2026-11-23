@@ -42,6 +42,8 @@ After installation, restart Home Assistant. Open **Settings → Devices & servic
 
 ## EEPROM and FLASH
 
+**Use at your own risk.** This integration is provided “as is”, without warranty. Verify compatibility with your controller and review the settings and commands you apply through Home Assistant, including RAM commands, EEPROM writes, and FLASH backups. Incorrect settings can change how connected loads operate. Record your known-good settings before making persistent changes. The MIT License and applicable law govern warranty and liability.
+
 Use the integration's **Configure** menu for occasional changes to persistent settings. EEPROM has limited write endurance. Use the RAM controls for routine automation.
 
 - **EEPROM: surplus outputs (BLACK)** sets surplus-regulation links for K1–K5 and SSR1–SSR6.
