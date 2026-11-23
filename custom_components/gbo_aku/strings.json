@@ -1,0 +1,418 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "This GBO-Aku is already configured."
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to GBO-Aku through PE11.",
+      "invalid_host": "Enter the PE11 hostname or IP address."
+    },
+    "step": {
+      "user": {
+        "data": {
+          "host": "PE11 host / IP",
+          "port": "TCP port",
+          "slave_id": "Modbus slave ID"
+        },
+        "description": "PE11 must use transparent mode Protocol=None. Close GreenBonO_HMI while adding the integration.",
+        "title": "GBO-Aku connection"
+      }
+    }
+  },
+  "options": {
+    "abort": {
+      "eeprom_read_failed": "Could not read the current EEPROM configuration. Check the connection and open Configure again."
+    },
+    "step": {
+      "init": {
+        "title": "GBO-Aku configuration",
+        "description": "Choose runtime settings or an explicit EEPROM configuration section.",
+        "menu_options": {
+          "runtime_settings": "Communication and polling",
+          "eeprom_surplus_outputs": "EEPROM: surplus outputs (BLACK)",
+          "eeprom_nt_timer_outputs": "EEPROM: NT / timer outputs (RED)",
+          "eeprom_regulation": "EEPROM: verified regulation settings",
+          "flash_backup": "FLASH: back up current configuration"
+        }
+      },
+      "runtime_settings": {
+        "title": "Communication and polling",
+        "description": "Polling and automatic GBO clock checks. The integration reloads automatically after saving.",
+        "data": {
+          "live_poll_interval": "Live data interval [s]",
+          "ram_poll_interval": "RAM interval [s]",
+          "eeprom_poll_interval": "EEPROM interval [s]",
+          "auto_time_sync": "Automatic time synchronization",
+          "time_sync_check_interval": "Time check interval [min]",
+          "max_time_offset": "Maximum allowed offset [s]",
+          "retry_failed_request": "Retry failed request",
+          "unavailable_after": "Mark unavailable after [s]"
+        },
+        "data_description": {
+          "live_poll_interval": "FC04 currents, voltage and PI. Range 1-60 s.",
+          "ram_poll_interval": "FC03 RAM time, relays and ExternControl. Range 1-3600 s.",
+          "eeprom_poll_interval": "FC03 EEPROM firmware, SSR mask and checksum. Range 30-86400 s.",
+          "auto_time_sync": "When enabled, the integration checks the GBO clock internally and writes only when the offset exceeds the limit or TimeIsSet != 0x55.",
+          "time_sync_check_interval": "How often GBO time is compared with Home Assistant. Range 5-1440 min.",
+          "max_time_offset": "Synchronize only when the absolute offset exceeds this value. Range 1-300 s.",
+          "retry_failed_request": "Number of immediate reconnect/retry attempts after a failed read. Range 0-3.",
+          "unavailable_after": "Keep the last valid values during short live-read outages and mark normal entities unavailable only after this time. Range 5-600 s."
+        }
+      },
+      "eeprom_surplus_outputs": {
+        "title": "EEPROM - surplus regulation outputs (BLACK)",
+        "description": "These links define which K relays and SSR outputs participate in surplus regulation. Saving writes EEPROM once and verifies the readback. EEPROM has limited write endurance.",
+        "data": {
+          "relay_k1_surplus_enabled": "Relay K1 - surplus regulation",
+          "relay_k2_surplus_enabled": "Relay K2 - surplus regulation",
+          "relay_k3_surplus_enabled": "Relay K3 - surplus regulation",
+          "relay_k4_surplus_enabled": "Relay K4 - surplus regulation",
+          "relay_k5_surplus_enabled": "Relay K5 - surplus regulation",
+          "ssr1_surplus_enabled": "SSR1 - surplus regulation",
+          "ssr2_surplus_enabled": "SSR2 - surplus regulation",
+          "ssr3_surplus_enabled": "SSR3 - surplus regulation",
+          "ssr4_surplus_enabled": "SSR4 - surplus regulation",
+          "ssr5_surplus_enabled": "SSR5 - surplus regulation",
+          "ssr6_surplus_enabled": "SSR6 - surplus regulation"
+        }
+      },
+      "eeprom_nt_timer_outputs": {
+        "title": "EEPROM - NT / timer outputs (RED)",
+        "description": "These links enable outputs through the low-tariff / timer path. Red SSR links include the auxiliary bits used by the original HMI. Saving writes EEPROM once and verifies the readback.",
+        "data": {
+          "relay_k1_nt_timer_enabled": "Relay K1 - NT / timers",
+          "relay_k2_nt_timer_enabled": "Relay K2 - NT / timers",
+          "relay_k3_nt_timer_enabled": "Relay K3 - NT / timers",
+          "relay_k4_nt_timer_enabled": "Relay K4 - NT / timers",
+          "relay_k5_nt_timer_enabled": "Relay K5 - NT / timers",
+          "ssr1_nt_timer_enabled": "SSR1 - NT / timers",
+          "ssr2_nt_timer_enabled": "SSR2 - NT / timers",
+          "ssr3_nt_timer_enabled": "SSR3 - NT / timers",
+          "ssr4_nt_timer_enabled": "SSR4 - NT / timers",
+          "ssr5_nt_timer_enabled": "SSR5 - NT / timers",
+          "ssr6_nt_timer_enabled": "SSR6 - NT / timers"
+        }
+      },
+      "eeprom_regulation": {
+        "title": "EEPROM - verified regulation settings",
+        "description": "Only settings empirically verified on FW 3.021 / HMI 3.0.3 are exposed. Saving performs read-modify-write, HMI-compatible EEConfigWord write, 0x55AA commit and readback verification.",
+        "data": {
+          "nt_bypass_enabled": "Connect surplus loads directly during low tariff (NT bypass)",
+          "ssr_slow_modulation_enabled": "1 second SSR cycle",
+          "udc_control_enabled": "Enable/disable regulation by Udc input",
+          "udc_control_inverted": "Invert Udc input function",
+          "half_period_modulation_enabled": "Half-period modulation",
+          "automatic_dst_enabled": "Automatic European daylight saving time",
+          "stop_after_dark_enabled": "Stop PI regulation after dark",
+          "regulation_start_delay": "Delayed regulation start [s]",
+          "k5_mode": "K5 operating mode",
+          "night_monday_enabled": "Night consumption - Monday",
+          "night_tuesday_enabled": "Night consumption - Tuesday",
+          "night_wednesday_enabled": "Night consumption - Wednesday",
+          "night_thursday_enabled": "Night consumption - Thursday",
+          "night_friday_enabled": "Night consumption - Friday",
+          "night_saturday_enabled": "Night consumption - Saturday",
+          "night_sunday_enabled": "Night consumption - Sunday"
+        }
+      },
+      "flash_backup": {
+        "title": "Back up current configuration to FLASH",
+        "description": "Overwrites the recovery copy in FLASH with the current 128-byte configuration image from EEPROM. Use only after verifying that the current settings are correct. This mirrors the original HMI “Back up complete configuration to MCU FLASH” action and resets GBO after successful programming. This action is never run automatically after an EEPROM write.",
+        "data": {
+          "confirm_flash_backup": "I confirm overwriting the FLASH recovery copy with the current EEPROM configuration"
+        }
+      }
+    },
+    "error": {
+      "eeprom_write_failed": "EEPROM write or verification failed. No write was automatically retried.",
+      "flash_backup_not_confirmed": "FLASH backup was not confirmed.",
+      "flash_backup_failed": "FLASH configuration backup or post-reset verification failed. The FLASH write was not automatically retried."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "current_l1": {
+        "name": "Current L1"
+      },
+      "current_l2": {
+        "name": "Current L2"
+      },
+      "current_l3": {
+        "name": "Current L3"
+      },
+      "current_total": {
+        "name": "Total current"
+      },
+      "voltage_l1": {
+        "name": "Voltage L1"
+      },
+      "pi_l1": {
+        "name": "PI L1"
+      },
+      "pi_l2": {
+        "name": "PI L2"
+      },
+      "pi_l3": {
+        "name": "PI L3"
+      },
+      "ssr1_output": {
+        "name": "SSR1 output"
+      },
+      "ssr2_output": {
+        "name": "SSR2 output"
+      },
+      "ssr3_output": {
+        "name": "SSR3 output"
+      },
+      "ssr4_output": {
+        "name": "SSR4 output"
+      },
+      "ssr5_output": {
+        "name": "SSR5 output"
+      },
+      "ssr6_output": {
+        "name": "SSR6 output"
+      },
+      "load_1_output": {
+        "name": "Load 1 output"
+      },
+      "load_2_output": {
+        "name": "Load 2 output"
+      },
+      "cascade_l1": {
+        "name": "Cascade L1"
+      },
+      "cascade_l2": {
+        "name": "Cascade L2"
+      },
+      "cascade_l3": {
+        "name": "Cascade L3"
+      },
+      "time": {
+        "name": "GBO time"
+      },
+      "date": {
+        "name": "GBO date"
+      },
+      "time_offset": {
+        "name": "GBO time offset"
+      },
+      "last_time_sync": {
+        "name": "Last time synchronization"
+      },
+      "firmware": {
+        "name": "Firmware"
+      },
+      "samples_count": {
+        "name": "Samples count"
+      },
+      "pi_l1_raw": {
+        "name": "PI L1 raw"
+      },
+      "pi_l2_raw": {
+        "name": "PI L2 raw"
+      },
+      "pi_l3_raw": {
+        "name": "PI L3 raw"
+      },
+      "relay_status_raw": {
+        "name": "Relay status raw"
+      },
+      "relays_enabled_raw": {
+        "name": "Relays enabled raw"
+      },
+      "circ_data_raw": {
+        "name": "CircData raw"
+      },
+      "config_word_raw": {
+        "name": "Config word raw"
+      },
+      "ssr_enable_mask": {
+        "name": "SSR surplus mask (BLACK)"
+      },
+      "eeprom_checksum": {
+        "name": "EEPROM checksum"
+      },
+      "live_poll_interval": {
+        "name": "Live polling"
+      },
+      "ram_poll_interval": {
+        "name": "RAM polling"
+      },
+      "eeprom_poll_interval": {
+        "name": "EEPROM polling"
+      },
+      "time_sync_check_interval": {
+        "name": "Time check interval"
+      },
+      "max_time_offset": {
+        "name": "Maximum time offset"
+      },
+      "communication_status": {
+        "name": "Communication status",
+        "state": {
+          "connected": "Connected",
+          "degraded": "Degraded",
+          "unavailable": "Unavailable"
+        }
+      },
+      "consecutive_failures": {
+        "name": "Consecutive failures"
+      },
+      "last_successful_communication": {
+        "name": "Last successful communication"
+      },
+      "last_communication_error": {
+        "name": "Last communication error"
+      },
+      "relay_surplus_mask": {
+        "name": "Relay surplus mask (BLACK)"
+      },
+      "relay_nt_timer_mask": {
+        "name": "Relay NT / timer mask (RED)"
+      },
+      "ssr_nt_timer_mask": {
+        "name": "SSR NT / timer mask (RED)"
+      },
+      "regulation_start_delay": {
+        "name": "Regulation start delay"
+      },
+      "last_eeprom_write": {
+        "name": "Last EEPROM write by HA"
+      },
+      "eeprom_writes_by_ha": {
+        "name": "EEPROM writes by HA"
+      },
+      "last_flash_backup": {
+        "name": "Last configuration backup to FLASH"
+      },
+      "flash_backups_by_ha": {
+        "name": "FLASH backups by HA"
+      }
+    },
+    "binary_sensor": {
+      "ssr1_enabled": {
+        "name": "SSR1 surplus enabled"
+      },
+      "ssr2_enabled": {
+        "name": "SSR2 surplus enabled"
+      },
+      "ssr3_enabled": {
+        "name": "SSR3 surplus enabled"
+      },
+      "ssr4_enabled": {
+        "name": "SSR4 surplus enabled"
+      },
+      "ssr5_enabled": {
+        "name": "SSR5 surplus enabled"
+      },
+      "ssr6_enabled": {
+        "name": "SSR6 surplus enabled"
+      },
+      "relay_k1_enabled": {
+        "name": "Relay K1 surplus enabled"
+      },
+      "relay_k2_enabled": {
+        "name": "Relay K2 surplus enabled"
+      },
+      "relay_k3_enabled": {
+        "name": "Relay K3 surplus enabled"
+      },
+      "relay_k4_enabled": {
+        "name": "Relay K4 surplus enabled"
+      },
+      "relay_k5_enabled": {
+        "name": "Relay K5 surplus enabled"
+      },
+      "time_is_set": {
+        "name": "Time is set"
+      },
+      "low_tariff": {
+        "name": "Low tariff"
+      },
+      "ssr1_nt_timer_enabled": {
+        "name": "SSR1 NT / timer enabled"
+      },
+      "ssr2_nt_timer_enabled": {
+        "name": "SSR2 NT / timer enabled"
+      },
+      "ssr3_nt_timer_enabled": {
+        "name": "SSR3 NT / timer enabled"
+      },
+      "ssr4_nt_timer_enabled": {
+        "name": "SSR4 NT / timer enabled"
+      },
+      "ssr5_nt_timer_enabled": {
+        "name": "SSR5 NT / timer enabled"
+      },
+      "ssr6_nt_timer_enabled": {
+        "name": "SSR6 NT / timer enabled"
+      },
+      "relay_k1_nt_timer_enabled": {
+        "name": "Relay K1 NT / timer enabled"
+      },
+      "relay_k2_nt_timer_enabled": {
+        "name": "Relay K2 NT / timer enabled"
+      },
+      "relay_k3_nt_timer_enabled": {
+        "name": "Relay K3 NT / timer enabled"
+      },
+      "relay_k4_nt_timer_enabled": {
+        "name": "Relay K4 NT / timer enabled"
+      },
+      "relay_k5_nt_timer_enabled": {
+        "name": "Relay K5 NT / timer enabled"
+      }
+    },
+    "select": {
+      "mode": {
+        "name": "Mode",
+        "state": {
+          "default": "Default",
+          "regulation": "Regulation",
+          "all_off": "All off",
+          "all_on": "All on"
+        },
+        "state_attributes": {
+          "raw_value": {
+            "name": "Raw value"
+          }
+        }
+      }
+    },
+    "button": {
+      "sync_time": {
+        "name": "Synchronize time"
+      }
+    },
+    "switch": {
+      "communication_enabled": {
+        "name": "Communication enabled"
+      }
+    }
+  },
+  "exceptions": {
+    "set_mode_failed": {
+      "message": "Failed to set the GBO-Aku mode: {error}"
+    },
+    "sync_time_failed": {
+      "message": "Failed to synchronize the GBO-Aku clock: {error}"
+    },
+    "communication_enable_failed": {
+      "message": "Failed to enable GBO-Aku communication: {error}"
+    },
+    "communication_disable_failed": {
+      "message": "Failed to disable GBO-Aku communication: {error}"
+    }
+  },
+  "selector": {
+    "k5_mode": {
+      "options": {
+        "cascade": "As fifth cascade relay",
+        "timer_only": "Controlled only by SH1 and NT",
+        "surplus_pump": "Surplus indication / circulation pump",
+        "unknown": "Unknown / preserve current"
+      }
+    }
+  }
+}

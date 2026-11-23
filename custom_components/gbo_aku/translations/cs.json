@@ -1,0 +1,418 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Toto GBO-Aku je již nakonfigurováno."
+    },
+    "error": {
+      "cannot_connect": "Nelze se připojit ke GBO-Aku přes PE11.",
+      "invalid_host": "Zadejte název hostitele nebo IP adresu převodníku PE11."
+    },
+    "step": {
+      "user": {
+        "data": {
+          "host": "Host / IP PE11",
+          "port": "TCP port",
+          "slave_id": "Modbus slave ID"
+        },
+        "description": "PE11 musí být v transparentním režimu Protocol=None. GreenBonO_HMI musí být během přidání zavřené.",
+        "title": "Připojení GBO-Aku"
+      }
+    }
+  },
+  "options": {
+    "abort": {
+      "eeprom_read_failed": "Nepodařilo se načíst aktuální konfiguraci EEPROM. Zkontrolujte připojení a znovu otevřete nastavení integrace."
+    },
+    "step": {
+      "init": {
+        "title": "Konfigurace GBO-Aku",
+        "description": "Vyberte provozní nastavení nebo explicitní konfiguraci EEPROM.",
+        "menu_options": {
+          "runtime_settings": "Komunikace a polling",
+          "eeprom_surplus_outputs": "EEPROM: výstupy pro přebytky (černé)",
+          "eeprom_nt_timer_outputs": "EEPROM: výstupy NT / hodiny (červené)",
+          "eeprom_regulation": "EEPROM: ověřené nastavení regulace",
+          "flash_backup": "FLASH: záloha aktuální konfigurace"
+        }
+      },
+      "runtime_settings": {
+        "title": "Komunikace a polling",
+        "description": "Polling a automatická kontrola hodin GBO. Po uložení se integrace automaticky znovu načte.",
+        "data": {
+          "live_poll_interval": "Live data - interval [s]",
+          "ram_poll_interval": "RAM - interval [s]",
+          "eeprom_poll_interval": "EEPROM - interval [s]",
+          "auto_time_sync": "Automatická synchronizace času",
+          "time_sync_check_interval": "Kontrola času - interval [min]",
+          "max_time_offset": "Max. povolená odchylka [s]",
+          "retry_failed_request": "Opakovat neúspěšný požadavek",
+          "unavailable_after": "Označit jako nedostupné po [s]"
+        },
+        "data_description": {
+          "live_poll_interval": "FC04: proudy, napětí a PI. Rozsah 1-60 s.",
+          "ram_poll_interval": "FC03 RAM: čas, relé, ExternControl. Rozsah 1-3600 s.",
+          "eeprom_poll_interval": "FC03 EEPROM: firmware, SSR maska, checksum. Rozsah 30-86400 s.",
+          "auto_time_sync": "Při zapnutí integrace interně kontroluje čas GBO a zapisuje jej pouze při překročení odchylky nebo pokud GBO hlásí TimeIsSet != 0x55.",
+          "time_sync_check_interval": "Jak často se má porovnat čas GBO s časem Home Assistantu. Rozsah 5-1440 min.",
+          "max_time_offset": "Synchronizace proběhne až při větší absolutní odchylce. Rozsah 1-300 s.",
+          "retry_failed_request": "Počet okamžitých reconnect/retry pokusů po neúspěšném čtení. Rozsah 0-3.",
+          "unavailable_after": "Při krátkém výpadku ponechá poslední platné hodnoty. Běžné entity označí jako nedostupné až po této době bez úspěšného live čtení. Rozsah 5-600 s."
+        }
+      },
+      "eeprom_surplus_outputs": {
+        "title": "EEPROM - regulace přebytků (černé propojky)",
+        "description": "Určuje, která relé K a SSR jsou zapojena do regulace přebytků. Uložení provede jeden zápis EEPROM a následnou kontrolu. EEPROM má omezený počet zápisů.",
+        "data": {
+          "relay_k1_surplus_enabled": "Relé K1 - přebytky",
+          "relay_k2_surplus_enabled": "Relé K2 - přebytky",
+          "relay_k3_surplus_enabled": "Relé K3 - přebytky",
+          "relay_k4_surplus_enabled": "Relé K4 - přebytky",
+          "relay_k5_surplus_enabled": "Relé K5 - přebytky",
+          "ssr1_surplus_enabled": "SSR1 - přebytky",
+          "ssr2_surplus_enabled": "SSR2 - přebytky",
+          "ssr3_surplus_enabled": "SSR3 - přebytky",
+          "ssr4_surplus_enabled": "SSR4 - přebytky",
+          "ssr5_surplus_enabled": "SSR5 - přebytky",
+          "ssr6_surplus_enabled": "SSR6 - přebytky"
+        }
+      },
+      "eeprom_nt_timer_outputs": {
+        "title": "EEPROM - NT / hodiny (červené propojky)",
+        "description": "Určuje výstupy povolené přes větev nízkého tarifu a spínacích hodin. U červených SSR se automaticky nastaví i pomocné bity používané originálním HMI.",
+        "data": {
+          "relay_k1_nt_timer_enabled": "Relé K1 - NT / hodiny",
+          "relay_k2_nt_timer_enabled": "Relé K2 - NT / hodiny",
+          "relay_k3_nt_timer_enabled": "Relé K3 - NT / hodiny",
+          "relay_k4_nt_timer_enabled": "Relé K4 - NT / hodiny",
+          "relay_k5_nt_timer_enabled": "Relé K5 - NT / hodiny",
+          "ssr1_nt_timer_enabled": "SSR1 - NT / hodiny",
+          "ssr2_nt_timer_enabled": "SSR2 - NT / hodiny",
+          "ssr3_nt_timer_enabled": "SSR3 - NT / hodiny",
+          "ssr4_nt_timer_enabled": "SSR4 - NT / hodiny",
+          "ssr5_nt_timer_enabled": "SSR5 - NT / hodiny",
+          "ssr6_nt_timer_enabled": "SSR6 - NT / hodiny"
+        }
+      },
+      "eeprom_regulation": {
+        "title": "EEPROM - ověřené nastavení regulace",
+        "description": "Zobrazeny jsou jen volby empiricky ověřené na FW 3.021 / HMI 3.0.3. Uložení provede read-modify-write, zápis EEConfigWord jako HMI, commit 0x55AA a kontrolní načtení.",
+        "data": {
+          "nt_bypass_enabled": "Při přebytcích v době NT připojit spotřebiče natvrdo",
+          "ssr_slow_modulation_enabled": "1 sec cyklus SSR",
+          "udc_control_enabled": "Zap/vyp regulace vstupem Udc",
+          "udc_control_inverted": "Invertovat funkci vstupu Udc",
+          "half_period_modulation_enabled": "Modulace na půlperiody",
+          "automatic_dst_enabled": "Automatické nastavení evropského letního času",
+          "stop_after_dark_enabled": "Za tmy stop PI regulace",
+          "regulation_start_delay": "Odložený start regulace [s]",
+          "k5_mode": "Způsob využití relé K5",
+          "night_monday_enabled": "Dny nočního odběru - pondělí",
+          "night_tuesday_enabled": "Dny nočního odběru - úterý",
+          "night_wednesday_enabled": "Dny nočního odběru - středa",
+          "night_thursday_enabled": "Dny nočního odběru - čtvrtek",
+          "night_friday_enabled": "Dny nočního odběru - pátek",
+          "night_saturday_enabled": "Dny nočního odběru - sobota",
+          "night_sunday_enabled": "Dny nočního odběru - neděle"
+        }
+      },
+      "flash_backup": {
+        "title": "Záloha aktuální konfigurace do FLASH",
+        "description": "Přepíše recovery kopii ve FLASH aktuálním 128B obrazem konfigurace z EEPROM. Použijte až po ověření, že současné nastavení je správné. Operace odpovídá tlačítku „Záloha celé konfigurace do FLASH uP“ v originálním HMI a po úspěšném zápisu GBO restartuje. Tato akce se nikdy nespouští automaticky po zápisu EEPROM.",
+        "data": {
+          "confirm_flash_backup": "Potvrzuji přepsání recovery kopie ve FLASH aktuální konfigurací EEPROM"
+        }
+      }
+    },
+    "error": {
+      "eeprom_write_failed": "Zápis nebo ověření EEPROM selhalo. Zápis nebyl automaticky opakován.",
+      "flash_backup_not_confirmed": "Záloha do FLASH nebyla potvrzena.",
+      "flash_backup_failed": "Záloha konfigurace do FLASH nebo následná kontrola po restartu selhala. FLASH zápis nebyl automaticky opakován."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "current_l1": {
+        "name": "Proud L1"
+      },
+      "current_l2": {
+        "name": "Proud L2"
+      },
+      "current_l3": {
+        "name": "Proud L3"
+      },
+      "current_total": {
+        "name": "Proud suma"
+      },
+      "voltage_l1": {
+        "name": "Napětí L1"
+      },
+      "pi_l1": {
+        "name": "PI L1"
+      },
+      "pi_l2": {
+        "name": "PI L2"
+      },
+      "pi_l3": {
+        "name": "PI L3"
+      },
+      "ssr1_output": {
+        "name": "SSR1 výkon"
+      },
+      "ssr2_output": {
+        "name": "SSR2 výkon"
+      },
+      "ssr3_output": {
+        "name": "SSR3 výkon"
+      },
+      "ssr4_output": {
+        "name": "SSR4 výkon"
+      },
+      "ssr5_output": {
+        "name": "SSR5 výkon"
+      },
+      "ssr6_output": {
+        "name": "SSR6 výkon"
+      },
+      "load_1_output": {
+        "name": "Zátěž 1"
+      },
+      "load_2_output": {
+        "name": "Zátěž 2"
+      },
+      "cascade_l1": {
+        "name": "Kaskáda L1"
+      },
+      "cascade_l2": {
+        "name": "Kaskáda L2"
+      },
+      "cascade_l3": {
+        "name": "Kaskáda L3"
+      },
+      "time": {
+        "name": "Čas GBO"
+      },
+      "date": {
+        "name": "Datum GBO"
+      },
+      "time_offset": {
+        "name": "Odchylka času GBO"
+      },
+      "last_time_sync": {
+        "name": "Poslední synchronizace času"
+      },
+      "firmware": {
+        "name": "Firmware"
+      },
+      "samples_count": {
+        "name": "Samples count"
+      },
+      "pi_l1_raw": {
+        "name": "PI L1 raw"
+      },
+      "pi_l2_raw": {
+        "name": "PI L2 raw"
+      },
+      "pi_l3_raw": {
+        "name": "PI L3 raw"
+      },
+      "relay_status_raw": {
+        "name": "Stav relé raw"
+      },
+      "relays_enabled_raw": {
+        "name": "Povolení relé raw"
+      },
+      "circ_data_raw": {
+        "name": "CircData raw"
+      },
+      "config_word_raw": {
+        "name": "Config word raw"
+      },
+      "ssr_enable_mask": {
+        "name": "Maska SSR pro přebytky (černé)"
+      },
+      "eeprom_checksum": {
+        "name": "EEPROM checksum"
+      },
+      "live_poll_interval": {
+        "name": "Live polling"
+      },
+      "ram_poll_interval": {
+        "name": "RAM polling"
+      },
+      "eeprom_poll_interval": {
+        "name": "EEPROM polling"
+      },
+      "time_sync_check_interval": {
+        "name": "Kontrola času"
+      },
+      "max_time_offset": {
+        "name": "Max. odchylka času"
+      },
+      "communication_status": {
+        "name": "Stav komunikace",
+        "state": {
+          "connected": "Připojeno",
+          "degraded": "Zhoršená komunikace",
+          "unavailable": "Nedostupné"
+        }
+      },
+      "consecutive_failures": {
+        "name": "Počet po sobě jdoucích chyb"
+      },
+      "last_successful_communication": {
+        "name": "Poslední úspěšná komunikace"
+      },
+      "last_communication_error": {
+        "name": "Poslední chyba komunikace"
+      },
+      "relay_surplus_mask": {
+        "name": "Maska relé pro přebytky (černé)"
+      },
+      "relay_nt_timer_mask": {
+        "name": "Maska relé NT / hodiny (červené)"
+      },
+      "ssr_nt_timer_mask": {
+        "name": "Maska SSR NT / hodiny (červené)"
+      },
+      "regulation_start_delay": {
+        "name": "Odložený start regulace"
+      },
+      "last_eeprom_write": {
+        "name": "Poslední zápis EEPROM z HA"
+      },
+      "eeprom_writes_by_ha": {
+        "name": "Počet zápisů EEPROM z HA"
+      },
+      "last_flash_backup": {
+        "name": "Poslední záloha konfigurace do FLASH"
+      },
+      "flash_backups_by_ha": {
+        "name": "Počet záloh do FLASH z HA"
+      }
+    },
+    "binary_sensor": {
+      "ssr1_enabled": {
+        "name": "SSR1 - přebytky povoleny"
+      },
+      "ssr2_enabled": {
+        "name": "SSR2 - přebytky povoleny"
+      },
+      "ssr3_enabled": {
+        "name": "SSR3 - přebytky povoleny"
+      },
+      "ssr4_enabled": {
+        "name": "SSR4 - přebytky povoleny"
+      },
+      "ssr5_enabled": {
+        "name": "SSR5 - přebytky povoleny"
+      },
+      "ssr6_enabled": {
+        "name": "SSR6 - přebytky povoleny"
+      },
+      "relay_k1_enabled": {
+        "name": "Relé K1 - přebytky povoleny"
+      },
+      "relay_k2_enabled": {
+        "name": "Relé K2 - přebytky povoleny"
+      },
+      "relay_k3_enabled": {
+        "name": "Relé K3 - přebytky povoleny"
+      },
+      "relay_k4_enabled": {
+        "name": "Relé K4 - přebytky povoleny"
+      },
+      "relay_k5_enabled": {
+        "name": "Relé K5 - přebytky povoleny"
+      },
+      "time_is_set": {
+        "name": "Čas nastaven"
+      },
+      "low_tariff": {
+        "name": "Nízký tarif"
+      },
+      "ssr1_nt_timer_enabled": {
+        "name": "SSR1 - NT / hodiny povoleny"
+      },
+      "ssr2_nt_timer_enabled": {
+        "name": "SSR2 - NT / hodiny povoleny"
+      },
+      "ssr3_nt_timer_enabled": {
+        "name": "SSR3 - NT / hodiny povoleny"
+      },
+      "ssr4_nt_timer_enabled": {
+        "name": "SSR4 - NT / hodiny povoleny"
+      },
+      "ssr5_nt_timer_enabled": {
+        "name": "SSR5 - NT / hodiny povoleny"
+      },
+      "ssr6_nt_timer_enabled": {
+        "name": "SSR6 - NT / hodiny povoleny"
+      },
+      "relay_k1_nt_timer_enabled": {
+        "name": "Relé K1 - NT / hodiny povoleny"
+      },
+      "relay_k2_nt_timer_enabled": {
+        "name": "Relé K2 - NT / hodiny povoleny"
+      },
+      "relay_k3_nt_timer_enabled": {
+        "name": "Relé K3 - NT / hodiny povoleny"
+      },
+      "relay_k4_nt_timer_enabled": {
+        "name": "Relé K4 - NT / hodiny povoleny"
+      },
+      "relay_k5_nt_timer_enabled": {
+        "name": "Relé K5 - NT / hodiny povoleny"
+      }
+    },
+    "select": {
+      "mode": {
+        "name": "Režim",
+        "state": {
+          "default": "Výchozí",
+          "regulation": "Regulace",
+          "all_off": "Vše vypnout",
+          "all_on": "Vše zapnout"
+        },
+        "state_attributes": {
+          "raw_value": {
+            "name": "Raw hodnota"
+          }
+        }
+      }
+    },
+    "button": {
+      "sync_time": {
+        "name": "Synchronizovat čas"
+      }
+    },
+    "switch": {
+      "communication_enabled": {
+        "name": "Komunikace povolena"
+      }
+    }
+  },
+  "exceptions": {
+    "set_mode_failed": {
+      "message": "Nepodařilo se nastavit režim GBO-Aku: {error}"
+    },
+    "sync_time_failed": {
+      "message": "Nepodařilo se synchronizovat čas GBO-Aku: {error}"
+    },
+    "communication_enable_failed": {
+      "message": "Nepodařilo se povolit komunikaci s GBO-Aku: {error}"
+    },
+    "communication_disable_failed": {
+      "message": "Nepodařilo se zakázat komunikaci s GBO-Aku: {error}"
+    }
+  },
+  "selector": {
+    "k5_mode": {
+      "options": {
+        "cascade": "Jako páté relé kaskády",
+        "timer_only": "Řízené pouze přes SH1 a NT",
+        "surplus_pump": "Indikace přebytků / oběhové čerpadlo",
+        "unknown": "Neznámé / zachovat aktuální"
+      }
+    }
+  }
+}
